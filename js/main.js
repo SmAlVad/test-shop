@@ -3,7 +3,10 @@ import Catalog from "./Catalog.js";
 import Basket from "./Basket.js";
 import CatalogSearch from "./CatalogSearch.js";
 
-// Запуск приложения
+/**
+ * Запуск приложения
+ * @param {Object} data
+ */
 function start(data){
   // Карзина
   const basket = new Basket(data);
@@ -25,5 +28,6 @@ function start(data){
   basketRemove(basket);
 }
 
-getData().then(data => start(data));
+const url = 'https://bymi.ru/api/goods';
+getData(url).then(data => start(data));
 

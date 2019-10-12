@@ -1,17 +1,16 @@
 export default class Catalog {
-  // @param data Obj данные товаров
-  // @param basket Obj карзина
+  /**
+   * @param data
+   * @param basket
+   */
   constructor(data, basket) {
     this.data = data;
     this.basket = basket;
   }
 
-  // Получить товар
-  getGood(id) {
-    return this.data[id];
-  }
-
-  // Добавляет Html разметку каталога товаров
+  /**
+   * Добавляет Html разметку каталога товаров
+   */
   render() {
     // Html каталога
     let catalogHtml = '';
@@ -33,7 +32,7 @@ export default class Catalog {
       // Html количества товаров с карзини и кнопка добавить
       let catalogBasketHtml = '';
       // Если товар есть в наличии, отображаем кнопку добавить в карзину
-      if (this.goodIsAvailable(item)) {
+      if (item.available) {
         catalogBasketHtml = `    
           <div class="catalog-item__basket">
             <div class="catalog-btn add-to-basket" data-good-id="${item.id}">Добавить в карзину</div>
@@ -46,7 +45,7 @@ export default class Catalog {
         `;
       }
 
-      if (this.isItemInBasket(item.id)) {
+      if (this.inBasket(item.id)) {
         let quantity = this.basket.getQuantity(item.id);
         let catalogItemBasketQuantity = `
             <div class="count-item-in-basket catalog-item__basket-good-${item.id}">
@@ -75,6 +74,10 @@ export default class Catalog {
     catalog.innerHTML = catalogHtml;
   }
 
+  /**
+   *
+   * @returns {string}
+   */
   pagination() {
     return `
      <div class="pagination-wrapper">
@@ -91,11 +94,12 @@ export default class Catalog {
    `
   }
 
-  goodIsAvailable(good) {
-    return good.available;
-  }
-
-  isItemInBasket(id) {
+  /**
+   *
+   * @param id
+   * @returns {boolean}
+   */
+  inBasket(id) {
     return typeof this.basket.basket[id] !== "undefined";
   }
 }

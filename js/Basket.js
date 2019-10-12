@@ -1,5 +1,8 @@
 export default class Basket {
-  // В корструкторе принимаем объект с данными товаров
+  /**
+   * В корструкторе принимаем объект с данными товаров
+   * @param goods
+   */
   constructor(goods) {
     // Получаем объект карзины из LocalStorage
     this.basket = this.getStorageBasket();
@@ -7,7 +10,9 @@ export default class Basket {
     this.goods = goods;
   }
 
-  // Добавляет Html карзины в разметку правой калонки
+  /**
+   * Добавляет Html карзины в разметку правой калонки
+   */
   render() {
     // Html карзины, открывающий тэг
     let basketHtl = `
@@ -38,8 +43,10 @@ export default class Basket {
     col.innerHTML = basketHtl;
   }
 
-  // Добавляет товара в карзину
-  // @param goodId int id товара
+  /**
+   * Добавляет товара в карзину
+   * @param goodId
+   */
   addToBasket(goodId) {
     // Получаем объект товра
     const good = this.goods[goodId];
@@ -98,29 +105,43 @@ export default class Basket {
     this.saveBasket();
   }
 
-  // Удаляет товар из карзины
+  /**
+   * Удаляет товар из карзины
+   * @param goodId
+   */
   remove(goodId) {
     delete this.basket[goodId];
     this.saveBasket();
   }
 
-  // Сохраняем изменение карзины в LocalStorage
+  /**
+   * Сохраняем изменение карзины в LocalStorage
+   */
   saveBasket() {
     localStorage.setItem('basket', JSON.stringify(this.basket));
   }
 
-  // Проверка, не пуста ли карзина
+  /**
+   * Проверка, не пуста ли карзина
+   * @returns {boolean}
+   */
   basketIsEmpty() {
     return Object.keys(this.basket).length === 0 && this.basket.constructor === Object
   }
 
-  // Получение карзины из LocalStorage
+  /**
+   * Получение карзины из LocalStorage
+   * @returns {Object}
+   */
   getStorageBasket() {
     // Если карзины нет, возвращается пустой объект
     return JSON.parse(localStorage.getItem('basket')) || {};
   }
 
-  // Html товаров в карзине
+  /**
+   * Html товаров в карзине
+   * @returns {string}
+   */
   htmlBasketItems(){
     let html = '';
 
@@ -145,7 +166,11 @@ export default class Basket {
     return html;
   }
 
-  // Возвращает количество товара в карзине
+  /**
+   * Возвращает количество товара в карзине
+   * @param id
+   * @returns {number}
+   */
   getQuantity(id) {
     return this.basket[id].quantity;
   }
