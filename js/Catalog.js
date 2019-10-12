@@ -49,7 +49,7 @@ export default class Catalog {
       if (this.isItemInBasket(item.id)) {
         let quantity = this.basket.getQuantity(item.id);
         let catalogItemBasketQuantity = `
-            <div class="count-item-in-basket" id="catalog-item__basket-good-${item.id}">
+            <div class="count-item-in-basket catalog-item__basket-good-${item.id}">
               <span class="text-bold">Добавлено:</span>&nbsp;
               <span class="in-basket color-blue">${quantity} товаров</span>
             </div>
@@ -73,23 +73,6 @@ export default class Catalog {
 
     const catalog = document.getElementById('catalog');
     catalog.innerHTML = catalogHtml;
-  }
-
-  // Возвращает ноду с количеством товара в карзине
-  // @id string id товара в карзине
-  nodeQuantity(id) {
-    let quantity = this.basket.getQuantity(id);
-    let html = `
-        <span class="text-bold">Добавлено:</span>&nbsp;
-        <span class="in-basket color-blue">${quantity} товаров</span>
-     `;
-
-    let el = document.createElement('div');
-    el.classList.add('count-item-in-basket');
-    el.id = `catalog-item__basket-good-${id}`;
-    el.innerHTML = html;
-
-    return el;
   }
 
   pagination() {

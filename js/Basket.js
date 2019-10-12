@@ -55,7 +55,7 @@ export default class Basket {
 
     } else {
       // Иначе добавляем товар в карзину
-      this.basket[goodId.toString()] = good;
+      this.basket[goodId] = good;
       // Присваиваем количество = 1
       this.basket[goodId].quantity = 1;
 
@@ -84,6 +84,17 @@ export default class Basket {
       basket.insertBefore(goodInBasket, basket.lastElementChild);
     }
 
+    // Меняем "в карзине пусто", на кнопку "заказать"
+    let emptyBasket = document.getElementsByClassName('basket-is-empty');
+    if (emptyBasket.length !== 0) {
+      let orderBtn = document.createElement('div');
+      orderBtn.classList.add('basket-btn');
+      orderBtn.innerHTML = 'заказать';
+      emptyBasket[0].after(orderBtn);
+      emptyBasket[0].remove();
+    }
+
+    // Сохраняем данные карзины
     this.saveBasket();
   }
 
