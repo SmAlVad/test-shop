@@ -179,7 +179,7 @@ html, body {
 }
 
 .basket__total h3 {
-  margin-bottom: 0;
+  /*margin-bottom: 0;*/
 }
 
 .total-price {
@@ -258,4 +258,8 @@ html, body {
 
 .color-blue {
   color: #47B9F8;
+}
+
+.mb-0 {
+  margin-bottom: 0;
 }

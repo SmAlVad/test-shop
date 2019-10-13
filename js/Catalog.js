@@ -10,13 +10,16 @@ export default class Catalog {
 
   /**
    * Добавляет Html разметку каталога товаров
+   * @param {Object} options
    */
-  render() {
+  render(options) {
     // Html каталога
     let catalogHtml = '';
 
+    const data = this.getData(options);
+
     // Для каждого товара
-    for (let item of Object.values(this.data)) {
+    for (let item of data) {
       // Html товара с открывающим тэгом
       let elementHtml = `
         <div class="catalog-item">
@@ -45,8 +48,11 @@ export default class Catalog {
         `;
       }
 
+      // Если товар есть в карзине
       if (this.inBasket(item.id)) {
+        // Получаем его количество
         let quantity = this.basket.getQuantity(item.id);
+
         let catalogItemBasketQuantity = `
             <div class="count-item-in-basket catalog-item__basket-good-${item.id}">
               <span class="text-bold">Добавлено:</span>&nbsp;
@@ -54,21 +60,23 @@ export default class Catalog {
             </div>
         `;
 
-        catalogBasketHtml = catalogBasketHtml + catalogItemBasketQuantity;
+        // Добавляем html количества товара в карзине
+        catalogBasketHtml += catalogItemBasketQuantity;
       }
 
       // закрывающий тег catalog-item__basket
-      catalogBasketHtml = catalogBasketHtml + '</div>';
+      catalogBasketHtml += '</div>';
 
       // добавление блока "добавить в карзину"
-      elementHtml = elementHtml + catalogBasketHtml;
+      elementHtml += catalogBasketHtml;
       // закрывающий тег
-      elementHtml = elementHtml + '</div>';
+      elementHtml += '</div>';
       // добавление товара в общий список
-      catalogHtml = catalogHtml + elementHtml;
+      catalogHtml += elementHtml;
     }
 
-    catalogHtml = catalogHtml + this.pagination();
+    // Добавление html пагенации
+    catalogHtml += this.pagination();
 
     const catalog = document.getElementById('catalog');
     catalog.innerHTML = catalogHtml;
@@ -76,26 +84,58 @@ export default class Catalog {
 
   /**
    *
+   * @param {Object} options
+   */
+  getData(options) {
+    const title = options.title;
+    const startPrice = options.startPrice;
+    const endPrice = options.endPrice;
+    const available = options.available;
+
+    return  Object.values(this.data).filter(function (el) {
+
+      if (title !== '*') {
+        if (!el.title.toLocaleLowerCase().includes(title)) return false
+      }
+
+      if (startPrice >= 0) {
+        if (el.price < startPrice) return false
+      }
+
+      if (endPrice !== '*') {
+        if (el.price > endPrice) return false
+      }
+
+      if (available !== '*') {
+        if (el.available !== available) return false
+      }
+
+      return true
+    });
+  }
+
+  /**
+   * Html пагенации
    * @returns {string}
    */
   pagination() {
     return `
      <div class="pagination-wrapper">
       <ul class="pagination">
-        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+        <li class="page-item"><a class="page-link" href="#"> < </a></li>
         <li class="page-item"><a class="page-link" href="#">1</a></li>
         <li class="page-item"><a class="page-link" href="#">2</a></li>
         <li class="page-item"><a class="page-link" href="#">3</a></li>
         <li class="page-item"><a class="page-link" href="#">...</a></li>
         <li class="page-item"><a class="page-link" href="#">14</a></li>
-        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+        <li class="page-item"><a class="page-link" href="#"> > </a></li>
       </ul>
     </div>
    `
   }
 
   /**
-   *
+   * Проверка, есть ли товар в карзине
    * @param id
    * @returns {boolean}
    */

@@ -15,9 +15,7 @@ export default class Basket {
    */
   render() {
     // Html карзины, открывающий тэг
-    let basketHtl = `
-    <div id="basket">
-    `;
+    let basketHtl = `<div id="basket">`;
 
     // Если в карзине пусто, то добавляем об этом запись
     if (this.basketIsEmpty()) {
@@ -27,13 +25,19 @@ export default class Basket {
         </div>
        </div>
       `;
-      basketHtl = basketHtl + emptyBasketHtml;
+      basketHtl += emptyBasketHtml;
     } else {
       // Иначе, отрисовываем элементы в карзине, добавляем кнопку заказать и закрывающий тэг
-      basketHtl = basketHtl + this.htmlBasketItems();
+      basketHtl += this.htmlBasketItems();
 
-      basketHtl = basketHtl + `
-         <div class="basket-btn">Заказать</div>
+      let totalPrice = this.htmlTotalPrice();
+
+      basketHtl += `
+          <div class="basket__total">
+             ${totalPrice}
+             <div class="basket-btn">Заказать</div>
+          </div>
+        </div>
         `;
     }
 
@@ -95,14 +99,28 @@ export default class Basket {
     let emptyBasket = document.getElementsByClassName('basket-is-empty');
     if (emptyBasket.length !== 0) {
       let orderBtn = document.createElement('div');
-      orderBtn.classList.add('basket-btn');
-      orderBtn.innerHTML = 'заказать';
+      orderBtn.classList.add('basket__total');
+      orderBtn.innerHTML = `
+         ${this.htmlTotalPrice()}
+         <div class="basket-btn">Заказать</div>
+      `;
       emptyBasket[0].after(orderBtn);
       emptyBasket[0].remove();
     }
 
     // Сохраняем данные карзины
     this.saveBasket();
+    // Обновляем представление конечной цены
+    this.updateTotalPrice()
+  }
+
+  /**
+   * Получение карзины из LocalStorage
+   * @returns {Object}
+   */
+  getStorageBasket() {
+    // Если карзины нет, возвращается пустой объект
+    return JSON.parse(localStorage.getItem('basket')) || {}
   }
 
   /**
@@ -112,6 +130,7 @@ export default class Basket {
   remove(goodId) {
     delete this.basket[goodId];
     this.saveBasket();
+    this.updateTotalPrice();
   }
 
   /**
@@ -127,15 +146,6 @@ export default class Basket {
    */
   basketIsEmpty() {
     return Object.keys(this.basket).length === 0 && this.basket.constructor === Object
-  }
-
-  /**
-   * Получение карзины из LocalStorage
-   * @returns {Object}
-   */
-  getStorageBasket() {
-    // Если карзины нет, возвращается пустой объект
-    return JSON.parse(localStorage.getItem('basket')) || {};
   }
 
   /**
@@ -160,10 +170,52 @@ export default class Basket {
         </div>    
       `;
 
-      html = html + goodHtml;
+      html += goodHtml
     }
 
-    return html;
+    return html
+  }
+
+  /**
+   * Возвращает html итоговой стоимости
+   * @returns {string}
+   */
+  htmlTotalPrice() {
+    let total = this.calcTotalPrice();
+    return `<div class="basket__total-price">
+              <h3 class="mb-0">ИТОГ</h3>
+              <div class="total-price"><span class="total-price-value">${total}</span> рублей</div>
+            </div>`
+  }
+
+  /**
+   * Вычисляет общую стоимость
+   * @returns {number}
+   */
+  calcTotalPrice() {
+    let total = 0;
+    for (let item of Object.values(this.basket)) {
+      // тк данные товаров генерятся рандомно, в карзине будут старые занчения цены
+      // поэтому для расчета берется актуальная цена товара
+      let good = this.goods[item.id];
+      total += good.price * item.quantity
+    }
+
+    return total
+  }
+
+  /**
+   *  Обновляет html итоговой стоимости
+   */
+  updateTotalPrice() {
+    let totalPrice = this.calcTotalPrice();
+    let el = document.querySelector('.total-price-value');
+
+    if (totalPrice === 0) {
+      document.querySelector('.basket__total-price').remove()
+    } else {
+      el.innerHTML = `${totalPrice}`
+    }
   }
 
   /**
@@ -172,6 +224,6 @@ export default class Basket {
    * @returns {number}
    */
   getQuantity(id) {
-    return this.basket[id].quantity;
+    return this.basket[id].quantity
   }
 }

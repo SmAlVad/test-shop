@@ -1,4 +1,4 @@
-export {getData, basketAdd, basketRemove}
+export {getData, basketAdd, basketRemove, search}
 
 /**
  * Получить данные
@@ -108,4 +108,34 @@ function basketAdd(basket) {
     // Добавляем прослушку на удаление из карзины
     basketRemove(basket);
   };
+}
+
+/**
+ * Обработчик формы поиска
+ * @param {Class} catalog
+ */
+function search(catalog) {
+  // Получаем форму
+  document.forms.search.onsubmit = function (event) {
+    event.preventDefault();
+
+    // Обрабатываем поля
+    let title = (this.elements.title.value) ? this.elements.title.value : '*';
+    let startPrice = (this.elements.start_price.value) ? parseInt(this.elements.start_price.value) : '*';
+    let endPrice = (this.elements.end_price.value) ? parseInt(this.elements.end_price.value) : '*';
+    let available = (this.elements.available.checked) ? true : '*';
+
+    // Получаем каталог
+    document.getElementById('catalog').innerHTML = '<h3 class="text-center">Поиск ...</h3>';
+
+    // Иметация поиска
+    setTimeout(function () {
+      catalog.render({
+        title: title,
+        startPrice: startPrice,
+        endPrice: endPrice,
+        available: available
+      });
+    }, 500)
+  }
 }

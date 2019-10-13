@@ -1,4 +1,4 @@
-import { getData, basketAdd, basketRemove } from "./Core.js";
+import { getData, basketAdd, basketRemove, search } from "./Core.js";
 import Catalog from "./Catalog.js";
 import Basket from "./Basket.js";
 import CatalogSearch from "./CatalogSearch.js";
@@ -19,13 +19,22 @@ function start(data){
   basket.render();
   // Отрисовка поиска
   catalogSearch.render();
+
   // Отрисовка списка товаров с пагинацией
-  catalog.render();
+  let options = {
+    title:        '*',  // любое название
+    startPrice:   0,    // начальная цена
+    endPrice:     '*',  // конечная цена, любая
+    available:    '*'   // в наличии, любое значение
+  };
+  catalog.render(options);
 
   // Прослушка события добавления товара в карзину
   basketAdd(basket);
   // Прослушка события удаления товара из карзину
   basketRemove(basket);
+  //
+  search(catalog);
 }
 
 const url = 'https://bymi.ru/api/goods';
