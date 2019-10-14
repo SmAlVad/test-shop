@@ -112,7 +112,7 @@ function basketAdd(basket) {
 
 /**
  * Обработчик формы поиска
- * @param {Class} catalog
+ * @param {Object} catalog
  */
 function search(catalog) {
   // Получаем форму

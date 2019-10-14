@@ -204,21 +204,37 @@ html, body {
 
 .page-item {
   margin-right: 10px;
-}
-
-.page-link {
   display: block;
   background-color: #FEFEFE;
   padding: 15px;
   text-decoration: none;
+  border: 3px solid #DAE5F0;
   border-radius: 5px;
   color: #353535;
+  cursor: pointer;
 }
 
-.page-link:hover {
+.page-link:hover, .page-prev:hover, .page-next:hover {
   background-color: #F4F8FB;
 }
 
+.page-item-active {
+  border: 3px solid #47B9F8;
+  cursor: default !important;
+}
+
+.page-item-active:hover {
+  background-color: #FEFEFE;
+}
+
+.page-disable {
+  color: #e6e6e6;
+  cursor: default !important;
+}
+
+.page-disable:hover {
+  background-color: #FEFEFE;
+}
 
 /*------- Buttons -------*/
 .catalog-btn {

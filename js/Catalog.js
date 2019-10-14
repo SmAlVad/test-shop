@@ -6,6 +6,7 @@ export default class Catalog {
   constructor(data, basket) {
     this.data = data;
     this.basket = basket;
+    this.itemPerPage = 5;
   }
 
   /**
@@ -13,10 +14,114 @@ export default class Catalog {
    * @param {Object} options
    */
   render(options) {
-    // Html каталога
-    let catalogHtml = '';
 
     const data = this.getData(options);
+
+    document.querySelector('#catalog').innerHTML = '';
+    let pagination = document.querySelector('.pagination-wrapper');
+    if (pagination) {
+      pagination.remove()
+    }
+
+    this.pagination(data);
+  }
+
+  /**
+   * Получить данные
+   * @param {Object} options
+   */
+  getData(options) {
+    const title       = options.title;        // Название товара
+    const startPrice  = options.startPrice;   // Начальная цена
+    const endPrice    = options.endPrice;     // Конечная цена
+    const available   = options.available;    // Есть в насичии
+
+    // Фильтруем данные по параметрам
+    return  Object.values(this.data).filter(function (el) {
+
+      if (title !== '*') {
+        if (!el.title.toLocaleLowerCase().includes(title.toLocaleLowerCase())) return false
+      }
+
+      if (startPrice >= 0) {
+        if (el.price < startPrice) return false
+      }
+
+      if (endPrice !== '*') {
+        if (el.price > endPrice) return false
+      }
+
+      if (available !== '*') {
+        if (el.available !== available) return false
+      }
+
+      return true
+    });
+  }
+
+  /**
+   * Html пагенации
+   * @returns {string}
+   */
+  pagination(data) {
+
+    localStorage.setItem('catalogList', JSON.stringify(data));
+
+    let lastLink = Math.ceil(data.length / this.itemPerPage);
+
+   //  let htmlPagination =  `
+   //    <ul class="pagination">
+   //      <li class="page-item page-prev page-disable"> < </li>
+   //      <li class="page-item page-link page-item-active">1</li>
+   //      <li class="page-item page-link">2</li>
+   //      <li class="page-item page-link">3</li>
+   //      <li class="page-item"> ... </li>
+   //      <li class="page-item page-link last-link">${lastLink}</li>
+   //      <li class="page-item page-next"> > </li>
+   //    </ul>
+   // `;
+
+    //let catalogHtml = this.htmlCatalog(data);
+
+    let  htmlPagination = '<ul class="pagination">';
+
+      for (let i = 1; i <= lastLink; i++) {
+        let li = `<li class="page-item page-link">${i}</li>`;
+        htmlPagination += li;
+      }
+
+      htmlPagination += '</ul>';
+
+    const app = document.getElementById('app');
+
+    let pagination = document.createElement('div');
+    pagination.classList.add('pagination-wrapper');
+    pagination.innerHTML = htmlPagination;
+
+    app.append(pagination);
+
+    pagination.addEventListener('click', this.paginatorHandler.bind(this));
+
+    document.querySelector('.page-link').click();
+  }
+
+  /**
+   * Проверка, есть ли товар в карзине
+   * @param id
+   * @returns {boolean}
+   */
+  inBasket(id) {
+    return typeof this.basket.basket[id] !== "undefined";
+  }
+
+  /**
+   * Html одной страницы каталога
+   * @param data
+   * @returns {string}
+   */
+  htmlCatalog(data) {
+    // Html каталога
+    let catalogHtml = '';
 
     // Для каждого товара
     for (let item of data) {
@@ -74,72 +179,31 @@ export default class Catalog {
       // добавление товара в общий список
       catalogHtml += elementHtml;
     }
-
-    // Добавление html пагенации
-    catalogHtml += this.pagination();
-
-    const catalog = document.getElementById('catalog');
-    catalog.innerHTML = catalogHtml;
+    return catalogHtml
   }
 
-  /**
-   *
-   * @param {Object} options
-   */
-  getData(options) {
-    const title = options.title;
-    const startPrice = options.startPrice;
-    const endPrice = options.endPrice;
-    const available = options.available;
+  paginatorHandler(event) {
+    const data = JSON.parse(localStorage.getItem('catalogList'));
+    const el = event.target;
 
-    return  Object.values(this.data).filter(function (el) {
+    if (el.classList.contains('page-link')) {
+      let active = document.querySelector('.page-item-active');
 
-      if (title !== '*') {
-        if (!el.title.toLocaleLowerCase().includes(title)) return false
+      if (active) {
+        active.classList.remove('page-item-active');
       }
 
-      if (startPrice >= 0) {
-        if (el.price < startPrice) return false
-      }
+      el.classList.add('page-item-active');
 
-      if (endPrice !== '*') {
-        if (el.price > endPrice) return false
-      }
+      let pageNam = +el.innerHTML;
 
-      if (available !== '*') {
-        if (el.available !== available) return false
-      }
+      let start = (pageNam - 1) * this.itemPerPage;
+      let end = start + this.itemPerPage;
+      let list = data.slice(start, end);
+      list = this.htmlCatalog(list);
 
-      return true
-    });
-  }
-
-  /**
-   * Html пагенации
-   * @returns {string}
-   */
-  pagination() {
-    return `
-     <div class="pagination-wrapper">
-      <ul class="pagination">
-        <li class="page-item"><a class="page-link" href="#"> < </a></li>
-        <li class="page-item"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item"><a class="page-link" href="#">...</a></li>
-        <li class="page-item"><a class="page-link" href="#">14</a></li>
-        <li class="page-item"><a class="page-link" href="#"> > </a></li>
-      </ul>
-    </div>
-   `
-  }
-
-  /**
-   * Проверка, есть ли товар в карзине
-   * @param id
-   * @returns {boolean}
-   */
-  inBasket(id) {
-    return typeof this.basket.basket[id] !== "undefined";
+      let catalog = document.querySelector('#catalog');
+      catalog.innerHTML = list;
+    }
   }
 }
